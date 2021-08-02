@@ -1,0 +1,94 @@
+# 	streamDevice protocol file for Agilent Model 33210A Arbitrary Waveform Generator
+# Based on ag33210a from triumf
+
+InTerminator = '\r\n';
+OutTerminator = '\r\n';
+# MaxInput = 0;
+# LockTimeout should be GT ReplyTimeout
+LockTimeout = 5000;
+ReplyTimeout = 200;
+ReadTimeout = 100;
+ExtraInput = Ignore;
+
+
+read_float {
+    out "\$1?"; in "%f";
+}
+
+write_float {
+    out "\$1\_%.6f";
+#    @init{ read_float; }
+}
+
+read_int {
+    out "\$1?"; in "%i";
+}
+
+write_int {
+    out "\$1\_%d";
+#    @init{ read_int;}
+}
+
+read_string {
+    out "\$1?"; in "%s";
+}
+
+write_string {
+    out "\$1\_%s";
+#    @init{ read_string;}
+}
+
+write_stringnospace {
+    out "\$1%s";
+#    @init{ read_string;}
+}
+
+
+
+write_stringwquotes {
+    out "\$1\_\"%s\"";
+#    @init{ read_string;}
+}
+
+read_volt {
+    out "READ?"; in "%f,%*f,%*f,%*f,%*f";
+}
+
+read_current {
+    in "%*f,%f,%*f,%*f,%*f";
+}
+
+read_resistance {
+    in "%*f,%*f,%f,%*f,%*f";
+}
+
+
+setresmode {
+    out ":SENS:RES:MODE\_%{MAN|AUTO}";
+}
+readresmode {
+    out ":SENS:RES:MODE?";
+    in "%{MAN|AUTO}";
+}
+
+
+writesourcefunction {
+    out ":SOUR:FUNC\_%{CURR|VOLT}";
+}
+
+getsourcefunction {
+    out ":SOUR:FUNC?";
+    in "%{CURR|VOLT}";
+}
+
+#read resistance range
+readresrange {
+    out ":RES:RANGE?";
+    in "%f";
+}
+
+#write resistance range
+writeresrange {
+    out ":RES:RANGE\_%i";
+}
+

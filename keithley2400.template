@@ -1,0 +1,1334 @@
+record(calcout, "$(P):SetControls")
+#SNS supprot for 2400 series 
+#IDN
+#
+#Enable Remote or local
+#:SYSTEM:KEY 23 This will simulate pressing the LOCAL button on the front panel
+record(bo, "$(P):Local") {
+  field(DESC, "When local disable all records")
+#  field(DTYP, "stream")
+#  field(OUT, "@keithley2400.proto write_int(:SYST:KEY 23) $(PORT)")
+  field(ZNAM, "REMOTE")
+  field(ONAM, "LOCAL")
+  info(archive, "Monitor, 00:00:01, VAL")
+  info(autosaveFields, "VAL")
+  field(PINI, "YES")
+}
+
+record (calcout, "$(P):requestreadLoc"){
+  field(INPA, "$(P):Local CP NMS")
+  field(CALC, "A")
+  field(DOPT, "Use CALC")
+  field(OOPT, "Transition To Zero")
+  field(OUT, "$(P):LoadLocChanges1.PROC")                     #scan only when output is off
+  info(archive, "Monitor, 00:00:01, VAL")
+}
+                    
+record(seq, "$(P):LoadLocChanges1") {
+  field(DESC, "Load local changes")
+  field(LNK1, "$(P):enableBO.VAL PP NMS")
+  field(DOL1, "$(P):enabledBI.VAL PP NMS")
+  field(DLY1, "10")						#wait until the values a fetched 
+  field(LNK2, "$(P):setVoltAO.VAL PP NMS")
+  field(DOL2, "$(P):setVoltRdAI.VAL PP NMS")
+  field(DLY2, "0.3")
+  field(LNK3, "$(P):setCurrAO.VAL PP NMS")
+  field(DOL3, "$(P):setCurrRdAI.VAL PP NMS")
+  field(DLY3, "0.3")
+  field(LNK4, "$(P):sourceFunctionMO.VAL PP NMS")
+  field(DOL4, "$(P):GetsourceFunction.VAL PP NMS")
+  field(DLY4, "0.3")
+  field(LNK5, "$(P):setrsen.VAL PP NMS")
+  field(DOL5, "$(P):getrsen.VAL PP NMS")
+  field(DLY5, "0.3")
+  field(LNK6, "$(P):rRangeMO.VAL PP NMS")
+  field(DOL6, "$(P):rRangeMI.VAL PP NMS")
+  field(DLY6, "0.3")
+  field(LNK7, "$(P):setComplVoltAO.VAL PP NMS")
+  field(DOL7, "$(P):setComplVoltRdAI.VAL PP NMS")
+  field(DLY7, "0.3")
+  field(LNK8, "$(P):vRangeMO.VAL PP NMS")
+  field(DOL8, "$(P):vRangeMI.VAL PP NMS")
+  field(DLY8, "0.3")
+  field(LNK9, "$(P):setComplCurrAO.VAL PP NMS")
+  field(DOL9, "$(P):setComplCurrRdAI.VAL PP NMS")
+  field(DLY9, "0.3")
+  field(LNKA, "$(P):iRangeMO.VAL PP NMS")
+  field(DOLA, "$(P):iRangeMI.VAL PP NMS")
+  field(DLYA, "0.3")
+  info(archive, "Monitor, 00:00:01, VAL")
+  field(SDIS, "$(P):Local NPP MS")
+  field(DISS, "INVALID")
+  field(DISV, "1")
+}
+
+
+record(stringin, "$(P):IDN") {
+  field(DESC, "SCPI identification string")
+  field(DTYP, "stream")
+  field(INP, "@keithley2400.proto read_string(*IDN) $(PORT)")
+  field(PINI, "YES")
+  info(archive, "Monitor, 00:00:01, VAL")
+  field(SDIS, "$(P):Local NPP MS")
+  field(DISS, "INVALID")
+  field(DISV, "1")
+}
+
+#RESET ERRORS
+record(bo, "$(P):RST") {
+  field(DESC, "SCPI Reset")
+  field(DTYP, "stream")
+  field(OUT, "@keithley2400.proto write_int(*RST) $(PORT)")
+  field(HIGH, "5")
+  info(archive, "Monitor, 00:00:01, VAL")
+  field(SDIS, "$(P):Local NPP MS")
+  field(DISS, "INVALID")
+  field(DISV, "1")
+
+}
+#CLEAR STATUS
+record(bo, "$(P):CLS") {
+  field(DESC, "SCPI Clear status")
+  field(DTYP, "stream")
+  field(OUT, "@keithley2400.proto write_int(*CLS) $(PORT)")
+  field(HIGH, "1")
+  info(archive, "Monitor, 00:00:01, VAL")
+  field(SDIS, "$(P):Local NPP MS")
+  field(DISS, "INVALID")
+  field(DISV, "1")
+
+}
+#GET STATUS BYTE
+record(longin, "$(P):GetSTB") {
+  field(DESC, "SCPI get status byte")
+  field(DTYP, "stream")
+  field(INP, "@keithley2400.proto read_int(*STB) $(PORT)")
+  field(SCAN, "2 second")
+  info(archive, "Monitor, 00:00:01, VAL")
+  field(SDIS, "$(P):Local NPP MS")
+  field(DISS, "INVALID")
+  field(DISV, "1")
+
+}
+#GET EVENT STATUS BYTE
+record(longin, "$(P):GetESR") {
+  field(DESC, "SCPI get event status byte")
+  field(DTYP, "stream")
+  field(INP, "@keithley2400.proto read_int(*ESR) $(PORT)")
+  field(SCAN, "2 second")
+  info(archive, "Monitor, 00:00:01, VAL")
+  field(SDIS, "$(P):Local NPP MS")
+  field(DISS, "INVALID")
+  field(DISV, "1")
+
+}
+#ENABLE EVENT STATUS
+record(longout, "$(P):SetESE") {
+  field(DESC, "SCPI enable event status")
+  field(DTYP, "stream")
+  field(OUT, "@keithley2400.proto write_int(*ESE) $(PORT)")
+  info(archive, "Monitor, 00:00:01, VAL")
+  field(SDIS, "$(P):Local NPP MS")
+  field(DISS, "INVALID")
+  field(DISV, "1")
+
+}
+
+
+#GET ENABLE EVENT STATUS
+record(longin, "$(P):GetESE") {
+  field(DESC, "SCPI enabled event status")
+  field(DTYP, "stream")
+  field(INP, "@keithley2400.proto read_int(*ESE) $(PORT)")
+  field(SCAN, "2 second")
+  info(archive, "Monitor, 00:00:01, VAL")
+  field(SDIS, "$(P):Local NPP MS")
+  field(DISS, "INVALID")
+  field(DISV, "1")
+
+}
+
+#ENABLE SERVIE REQUEST
+record(longout, "$(P):SetSRE") {
+  field(DESC, "SCPI enable service request")
+  field(DTYP, "stream")
+  field(OUT, "@keithley2400.proto write_int(*SRE) $(PORT)")
+  info(archive, "Monitor, 00:00:01, VAL")
+  field(SDIS, "$(P):Local NPP MS")
+  field(DISS, "INVALID")
+  field(DISV, "1")
+
+}
+
+#ENABLE SERVICE REQUEST
+record(longin, "$(P):GetSRE") {
+  field(DESC, "SCPI enabled service request")
+  field(DTYP, "stream")
+  field(INP, "@keithley2400.proto read_int(*SRE) $(PORT)")
+  field(SCAN, "2 second")
+  info(archive, "Monitor, 00:00:01, VAL")
+  field(SDIS, "$(P):Local NPP MS")
+  field(DISS, "INVALID")
+  field(DISV, "1")
+
+}
+
+#COMPLETION STATUS
+record(longin, "$(P):GetOPC") {
+  field(DESC, "Output completion status")
+  field(DTYP, "stream")
+  field(INP, "@keithley2400.proto read_int(*OPC) $(PORT)")
+  field(SCAN, "2 second")
+  info(archive, "Monitor, 00:00:01, VAL")
+  field(SDIS, "$(P):Local NPP MS")
+  field(DISS, "INVALID")
+  field(DISV, "1")
+
+}
+
+##########################################
+##SET OUTPUT TO ON
+###########################################
+record(bo, "$(P):enableBO") {
+   field(DESC, "Enable output")
+   field(DTYP, "stream")
+   field(SCAN, "Passive")
+   field(OUT, "@keithley2400.proto write_int(:OUTP) $(PORT)")
+   field(ZNAM, "Off")
+   field(ONAM, "On")
+   info(archive, "Monitor, 00:00:01, VAL")
+   info(autosaveFields, "VAL")
+   field(SDIS, "$(P):Local NPP MS")
+   field(DISS, "INVALID")
+   field(DISV, "1")
+}
+           
+##########################################
+#READ STATUS OF THE OUTPUT
+##########################################
+record(bi, "$(P):enabledBI") {
+  field(DESC, "Output status")
+  field(SCAN, "2 second")
+  field(DTYP, "stream")
+  field(INP, "@keithley2400.proto read_int(:OUTP) $(PORT)")
+  field(ZNAM, "Off")
+  field(ONAM, "On")
+  field(FLNK, "$(P):scanEnBO PP MS")
+  field(PINI, "YES")
+  info(archive, "Monitor, 00:00:01, VAL")
+  field(SDIS, "$(P):Local NPP MS")
+  field(DISS, "INVALID")
+  field(DISV, "1")
+
+}
+
+##########################################
+#SET OTUPUT VOLTAGE
+##########################################
+
+record(ao, "$(P):setVoltAO") {
+  field(DESC, "Set output voltage")
+  field(DTYP, "stream")
+  field(OUT, "@keithley2400.proto write_float(:SOUR:VOLT:LEV) $(PORT)")
+  field(PREC, "6")
+  field(DRVH, "20")
+  field(DRVL, "0")
+  field(EGU, "Volts")
+  field(FLNK, "$(P):setVoltRdAI.VAL")
+  info(archive, "Monitor, 00:00:01, VAL")
+  info(autosaveFields, "VAL")
+  field(SDIS, "$(P):Local NPP MS")
+  field(DISS, "INVALID")
+  field(DISV, "1")
+
+}
+
+#########################################
+#READ VOLTAGE SETPOINT
+#########################################
+record(ai, "$(P):setVoltRdAI") {
+  field(DESC, "Monitor of V setting")
+  field(DTYP, "stream")
+  field(PINI, "YES")
+  field(INP, "@keithley2400.proto read_float(:SOUR:VOLT:LEV) $(PORT)")
+  field(PREC, "6")
+  field(EGU, "Volts")
+  field(LINR, "NO CONVERSION")
+  info(archive, "Monitor, 00:00:01, VAL")
+  field(SDIS, "$(P):Local NPP MS")
+  field(DISS, "INVALID")
+  field(DISV, "1")
+  field(SCAN, "2 second")
+}
+
+#########################################
+#SET VOLTAGE LIMIT
+#########################################
+record(ao, "$(P):setComplVoltAO") {
+  field(DESC, "Set compliance voltage")
+  field(DTYP, "stream")
+  field(OUT, "@keithley2400.proto write_float(:SENS:VOLT:PROT) $(PORT)")
+  field(PREC, "6")
+  field(HOPR, "20")
+  field(EGU, "Volts")
+  field(FLNK, "$(P):setComplVoltRdAI.VAL")
+  info(archive, "Monitor, 00:00:01, VAL")
+  info(autosaveFields, "VAL")
+  field(SDIS, "$(P):Local NPP MS")
+  field(DISS, "INVALID")
+  field(DISV, "1")
+  field(SCAN, "Passive")
+}
+#########################################
+#READ VOLTAGE LIMIT
+#########################################
+record(ai, "$(P):setComplVoltRdAI") {
+  field(DESC, "Monitor V Compliance")
+  field(DTYP, "stream")
+  field(PINI, "YES")
+  field(INP, "@keithley2400.proto read_float(:SENS:VOLT:PROT) $(PORT)")
+  field(EGU, "Volts")
+  field(PREC, "6")
+  info(archive, "Monitor, 00:00:01, VAL")
+  field(SDIS, "$(P):Local NPP MS")
+  field(DISS, "INVALID")
+  field(DISV, "1")
+  field(SCAN, "2 second")
+
+}
+#########################################
+#READ STATUS of VOLTAGE COMPLIANCE
+#########################################
+record(bi, "$(P):voltComplBI") {
+  field(DESC, "Status of voltage compliance")
+  field(DTYP, "stream")
+  field(INP, "@keithley2400.proto read_int(:SENS:VOLT:PROT:TRIP) $(PORT)")
+  field(SCAN, "2 second")
+  field(ZNAM, "OK")
+  field(ONAM, "Trip")
+  field(ZSV, "NO_ALARM")
+  field(OSV, "MAJOR")
+  info(archive, "Monitor, 00:00:01, VAL")
+  field(SDIS, "$(P):Local NPP MS")
+  field(DISS, "INVALID")
+  field(DISV, "1")
+}
+#########################################
+#READ ACTUAL VOLTAGE
+#########################################
+
+record (calcout, "$(P):requestread"){
+  field(INPA, "$(P):enabledBI")
+#  field(INPB, "$(P):enableBO")
+  field(CALC, "A")
+  field(DOPT, "Use CALC")
+  field(OOPT, "When Non-zero")
+  field(OUT, "$(P):enabledBI.PROC")     		#scan only when output is off
+  info(archive, "Monitor, 00:00:01, VAL")
+  field(SCAN, "2 second")
+  field(SDIS, "$(P):Local NPP MS")
+  field(DISS, "INVALID")
+  field(DISV, "0")
+
+}
+
+record(calc, "$(P):AllowVRequests") {
+  field(DESC, "Allow voltage requests")
+  field(INPA, "$(P):enabledBI NPP NMS")
+  field(INPB, "$(P):Local NPP NMS")
+  field(CALC, "B|!A")
+  info(archive, "Monitor, 00:00:01, VAL")
+  field(FLNK, "$(P):ActualVoltage")
+  field(SCAN, "2 second")
+}
+
+
+
+record(ai, "$(P):ActualVoltage") {
+  field(DESC, "Measured Voltage. Rqst when on or rem")
+  field(DTYP, "stream")
+  field(INP, "@keithley2400.proto read_volt $(PORT)")
+  field(PREC, "6")
+  field(EGU, "Volts")
+  field(LINR, "NO CONVERSION")
+  info(archive, "Monitor, 00:00:01, VAL")
+  field(SDIS, "$(P):AllowVRequests NPP MS")
+  field(DISS, "INVALID")
+  field(DISV, "1")
+}
+##########################################
+##SET OTUPUT CURRENT 
+###########################################
+record(ao, "$(P):setCurrAO") {
+  field(DESC, "Set output current")
+  field(DTYP, "stream")
+  field(SCAN, "Passive")
+  field(OUT, "@keithley2400.proto write_float(:SOUR:CURR:LEV) $(PORT)")
+  field(PREC, "6")
+  field(HOPR, "1")
+  field(EGU, "Amps")
+  field(FLNK, "$(P):setCurrRdAI.VAL")
+  info(archive, "Monitor, 00:00:01, VAL")
+  info(autosaveFields, "VAL")
+  field(SDIS, "$(P):Local NPP MS")
+  field(DISS, "INVALID")
+  field(DISV, "1")
+
+}
+##########################################
+#READ OTUPUT CURRENT SP
+###########################################
+record(ai, "$(P):setCurrRdAI") {
+  field(DESC, "Monitor of I setting")
+  field(DTYP, "stream")
+  field(PINI, "YES")
+  field(INP, "@keithley2400.proto read_float(:SOUR:CURR:LEV) $(PORT)")
+  field(EGU, "Amps")
+  field(PREC, "6")
+  field(LINR, "NO CONVERSION")
+  info(archive, "Monitor, 00:00:01, VAL")
+  field(SDIS, "$(P):Local NPP MS")
+  field(DISS, "INVALID")
+  field(DISV, "1")
+  field(SCAN, "2 second")
+}
+##########################################
+##SET CURRENT LIMIT 
+###########################################
+record(ao, "$(P):setComplCurrAO") {
+  field(DESC, "Set compliance current")
+  field(DTYP, "stream")
+  field(SCAN, "Passive")
+  field(OUT, "@keithley2400.proto write_float(:SENS:CURR:PROT:LEV) $(PORT)")
+  field(PREC, "6")
+  field(EGU, "Amps")
+  field(FLNK, "$(P):setComplCurrRdAI.VAL")
+  field(DRVH, "1.0")
+  info(archive, "Monitor, 00:00:01, VAL")
+  info(autosaveFields, "VAL")
+  field(SDIS, "$(P):Local NPP MS")
+  field(DISS, "INVALID")
+  field(DISV, "1")
+
+}
+#########################################
+#READ CURRENT LIMIT
+##########################################
+
+record(ai, "$(P):setComplCurrRdAI") {
+  field(DESC, "Monitor I Compliance")
+  field(DTYP, "stream")
+  field(INP, "@keithley2400.proto read_float(:SENS:CURR:PROT) $(PORT)")
+  field(PREC, "6")
+  field(EGU, "Amps")
+  field(LINR, "NO CONVERSION")
+  field(PINI, "YES")
+  info(archive, "Monitor, 00:00:01, VAL")
+  field(SDIS, "$(P):Local NPP MS")
+  field(DISS, "INVALID")
+  field(DISV, "1")
+  field(SCAN, "2 second")
+}
+##########################################
+#READ LIMIT STATUS 
+###########################################
+record(bi, "$(P):currComplBI") {
+  field(DESC, "Status of current compliance")
+  field(DTYP, "stream")
+  field(INP, "@keithley2400.proto read_int(:SENS:CURR:PROT:TRIP) $(PORT)")
+  field(SCAN, "2 second")
+  field(ZNAM, "OK")
+  field(ONAM, "Trip")
+  field(ZSV, "NO_ALARM")
+  field(OSV, "MAJOR")
+  info(archive, "Monitor, 00:00:01, VAL")
+  field(SDIS, "$(P):Local NPP MS")
+  field(DISS, "INVALID")
+  field(DISV, "1")
+
+}
+############################################
+#READ ACTUAL CURRENT
+############################################
+record(ai, "$(P):ActualCurrent") {
+  field(DESC, "Measured current")
+  field(DTYP, "stream")
+  field(SCAN, "I/O Intr")
+  field(INP, "@keithley2400.proto read_current $(PORT)")
+  field(EGU, "Amps")
+  field(PREC, "6")
+  field(LINR, "NO CONVERSION")
+  info(archive, "Monitor, 00:00:01, VAL")
+  field(SDIS, "$(P):Local NPP MS")
+  field(DISS, "INVALID")
+  field(DISV, "1")
+
+}
+################################################################
+#Set ranges for V 
+################################################################
+record(mbbo, "$(P):vRangeMO") {
+  field(DESC, "Voltage range")
+  field(DTYP, "stream")
+  field(SCAN, "Passive")
+  field(ZRST, "MANUAL")
+  field(ZRVL, "0")
+  field(ONST, "AUTO")
+  field(ONVL, "1")
+  field(OUT, "@keithley2400.proto write_int(:SOUR:VOLT:RANG:AUTO) $(PORT)")
+  field(FLNK, "$(P):vRangeMI")
+  info(archive, "Monitor, 00:00:01, VAL")
+  info(autosaveFields, "VAL")
+  field(SDIS, "$(P):Local NPP MS")
+  field(DISS, "INVALID")
+  field(DISV, "1")
+
+}
+
+record(bi, "$(P):vRangeMI") {
+  field(DESC, "Voltage Range status")
+  field(DTYP, "stream")
+  field(INP, "@keithley2400.proto read_int(:SOUR:VOLT:RANG:AUTO) $(PORT)")
+  field(ZNAM, "MANUAL")
+  field(ONAM, "AUTO")
+  field(PINI, "YES")
+  info(archive, "Monitor, 00:00:01, VAL")
+  field(SDIS, "$(P):Local NPP MS")
+  field(DISS, "INVALID")
+  field(DISV, "1")
+  field(SCAN, "2 second")
+}
+
+record(mbbo, "$(P):vRangeSP") {
+  field(DESC, "Set voltage Range")
+  field(DTYP, "stream")
+  field(SCAN, "Passive")
+  field(ZRST, "0.210")
+  field(ZRVL, "0")
+  field(ONST, "2.1")
+  field(ONVL, "1")
+  field(TWST, "21.0")
+  field(TWVL, "3")
+  field(OUT, "@keithley2400.proto write_int(:SOUR:VOLT:RANG) $(PORT)")
+  field(FLNK, "$(P):vRangeRead")
+  info(archive, "Monitor, 00:00:01, VAL")
+  info(autosaveFields, "VAL")
+  field(SDIS, "$(P):Local NPP MS")
+  field(DISS, "INVALID")
+  field(DISV, "1")
+
+}
+
+record(ai, "$(P):vRangeRead") {
+  field(DESC, "Read voltage Range")
+  field(DTYP, "stream")
+  field(INP, "@keithley2400.proto read_float(:SOUR:VOLT:RANG) $(PORT)")
+  field(PREC, "6")
+  field(EGU, "Volts")
+  field(PINI, "YES")
+  info(archive, "Monitor, 00:00:01, VAL")
+  field(SDIS, "$(P):Local NPP MS")
+  field(DISS, "INVALID")
+  field(DISV, "1")
+  field(SCAN, "2 second")
+}
+
+###############################################################
+#Set ranges I
+################################################################
+
+record(mbbo, "$(P):iRangeMO") {
+  field(DESC, "Current range")
+  field(DTYP, "stream")
+  field(SCAN, "Passive")
+  field(ZRST, "MANUAL")
+  field(ZRVL, "0")
+  field(ONST, "AUTO")
+  field(ONVL, "1")
+  field(OUT, "@keithley2400.proto write_int(:SOUR:CURR:RANG:AUTO) $(PORT)")
+  field(FLNK, "$(P):iRangeMI")
+  info(archive, "Monitor, 00:00:01, VAL")
+  info(autosaveFields, "VAL")
+  field(SDIS, "$(P):Local NPP MS")
+  field(DISS, "INVALID")
+  field(DISV, "1")
+
+}
+
+record(bi, "$(P):iRangeMI") {
+  field(DESC, "Current Range status")
+  field(DTYP, "stream")
+  field(INP, "@keithley2400.proto read_int(:SOUR:CURR:RANG:AUTO) $(PORT)")
+  field(ZNAM, "MANUAL")
+  field(ONAM, "AUTO")
+  field(PINI, "YES")
+  info(archive, "Monitor, 00:00:01, VAL")
+  field(SDIS, "$(P):Local NPP MS")
+  field(DISS, "INVALID")
+  field(DISV, "1")
+  field(SCAN, "2 second")
+}
+
+record(mbbo, "$(P):iRangeSP") {
+  field(DESC, "Set current Range")
+  field(SCAN, "Passive")
+  field(ZRST, "0.105")
+  field(ZRVL, "1")
+  field(ONST, "1.050")
+  field(ONVL, "1")
+  field(FLNK,"$(P):setiRange")
+  info(archive, "Monitor, 00:00:01, VAL")
+  info(autosaveFields, "VAL")
+  field(SDIS, "$(P):Local NPP MS")
+  field(DISS, "INVALID")
+  field(DISV, "1")
+
+}
+
+record(calcout, "$(P):setiRange"){
+  field(INPA, "$(P):iRangeSP.VAL")
+  field(CALC, "A=0?0.1:0.2")
+  field(OUT, "@keithley2400.proto write_float(:SOUR:CURR:RANG) $(PORT)")
+  field(DTYP, "stream")
+  field(FLNK, "$(P):iRangeRead")
+  field(SDIS, "$(P):Local NPP MS")
+  field(DISS, "INVALID")
+  field(DISV, "1")
+  field(SCAN, "")
+}
+
+
+record(ai, "$(P):iRangeRead") {
+  field(DESC, "Read Current Range")
+  field(DTYP, "stream")
+  field(INP, "@keithley2400.proto read_float(:SOUR:CURR:RANG) $(PORT)")
+  field(PREC, "6")
+  field(EGU, "Amps")
+  field(PINI, "YES")
+  info(archive, "Monitor, 00:00:01, VAL")
+  field(SDIS, "$(P):Local NPP MS")
+  field(DISS, "INVALID")
+  field(DISV, "1")
+  field(SCAN, "2 second")
+}
+
+
+
+
+##############################################################################
+#static char *sourceFunctionFList[] = {
+#   ":SOUR:FUNC VOLT",
+#   ":SOUR:FUNC CURR",
+#   };
+#NOTE RMODE AUTO DOES NOT ALLOW V SOURCE MODE HENCE THE USAGE OF 6 RECORDS BELOW                
+record(mbbo, "$(P):sourceFunctionMO") {
+  field(DESC, "Sense function")
+  field(SCAN, "Passive")
+  field(ZRST, "CURRENT")
+  field(ONST, "VOLTAGE")
+  field(TWST, "RESISTANCE")
+  field(ZRVL, "0")
+  field(ONVL, "1")
+  field(TWVL, "2")
+  info(archive, "Monitor, 00:00:01, VAL")
+  info(autosaveFields, "VAL")
+  field(SDIS, "$(P):Local NPP MS")
+  field(DISS, "INVALID")
+  field(DISV, "1")
+
+}
+
+record (calcout, "$(P):DecideSourceMode1"){
+  field(DESC, "decide if v is selected")
+  field(INPA, "$(P):sourceFunctionMO CP NMS")
+  field(CALC, "A=1") 						#if voltage is selected res mode manual
+  field(DOPT, "Use CALC")
+  field(OOPT, "When Non-zero")
+  field(OUT, "$(P):resMMVS.PROC PP NMS")                             #trigger sequence res mod man v source
+  info(archive, "Monitor, 00:00:01, VAL")
+}
+
+record(seq, "$(P):resMMVS") {
+  field(DESC, "res mode man then source to v")
+  field(LNK1, "$(P):setresmode PP NMS")				#set res mode to manual
+  field(DO1, "0")
+  field(DLY1, "0")
+  field(LNK2, "$(P):sourceFHWW.VAL PP NMS")		#set res mode to Voltage
+  field(DO2, "1")
+  field(DLY2, "2")
+  info(archive, "Monitor, 00:00:01, VAL")
+  field(SDIS, "$(P):Local NPP MS")
+  field(DISS, "INVALID")
+  field(DISV, "1")
+
+}
+
+record (calcout, "$(P):DecideSourceMode2"){
+  field(DESC, "decide if I or R is selected")
+  field(INPA, "$(P):sourceFunctionMO CP NMS")
+  field(CALC, "A!=1")                                            #if I or R is selected res mode auto
+  field(DOPT, "Use CALC")
+  field(OOPT, "When Non-zero")
+  field(OUT, "$(P):resMACS.PROC PP NMS")             
+  info(archive, "Monitor, 00:00:01, VAL")
+}
+
+
+record(seq, "$(P):resMACS") {
+  field(DESC, "res mode auto then source to i")
+  field(LNK1, "$(P):setresmode PP NMS")                         #set res mode to auto
+  field(DO1, "1")
+  field(DLY1, "0")
+  field(LNK2, "$(P):sourceFHWW.VAL PP NMS")                #set res mode to Current
+  field(DO2, "0")
+  field(DLY2, "2")
+  info(archive, "Monitor, 00:00:01, VAL")
+  field(SDIS, "$(P):Local NPP MS")
+  field(DISS, "INVALID")
+  field(DISV, "1")
+
+}
+
+
+record(bo, "$(P):sourceFHWW") {
+  field(DESC, "Write Source function")
+  field(SCAN, "Passive")
+  field(ZNAM, "CURR")
+  field(ONAM, "VOLT")
+  field(DTYP, "stream")
+  field(OUT, "@keithley2400.proto writesourcefunction() $(PORT)")
+  info(archive, "Monitor, 00:00:01, VAL")
+  field(SDIS, "$(P):Local NPP MS")
+  field(DISS, "INVALID")
+  field(DISV, "1")
+
+}
+
+
+record(bi, "$(P):GetsourceFunction") {
+  field(DESC, "Get Source Function")
+  field(ZNAM, "CURRENT")
+  field(ONAM, "VOLTAGE")
+  field(DTYP, "stream")
+  field(INP, "@keithley2400.proto getsourcefunction $(PORT)")
+  field(PINI, "YES")
+  field(SDIS, "$(P):Local NPP MS")
+  field(DISS, "INVALID")
+  field(DISV, "1")
+  field(SCAN, "2 second")
+}
+
+#static char *senseFunctionFList[] = {
+#    ":SENS:FUNC 'VOLT'",
+#    ":SENS:FUNC 'CURR'",
+#    ":SENS:FUNC 'RES'",
+#    NULL
+#    };
+
+
+record(mbbo, "$(P):senseFunctionMO") {
+  field(DESC, "Sense function")
+  field(SCAN, "Passive")
+  field(ZRST, "")
+  field(ONST, "ALLOFF")
+  field(TWST, "VOLT")
+  field(THST, "CURR")
+  field(FRST, "RES")
+  field(FVST, "ALLON")
+  field(ZRVL, "0")
+  field(ONVL, "1")
+  field(TWVL, "2")
+  field(THVL, "3")
+  field(FRVL, "4")
+  field(FVVL, "5")
+  info(archive, "Monitor, 00:00:01, VAL")
+  info(autosaveFields, "VAL")
+  field(SDIS, "$(P):Local NPP MS")
+  field(DISS, "INVALID")
+  field(DISV, "1")
+
+}
+
+
+record(seq, "$(P):senseFuncSeq") {
+  field(DESC, "Send V I or R sense")
+  field(LNK1, "$(P):senseFuncAllOFF.PROC PP NMS")
+  field(DO1, "1")
+  field(LNK2, "$(P):senseFuncVOLT.PROC PP NMS")
+  field(DO2, "1")
+  field(LNK3, "$(P):senseFuncCURR.PROC PP NMS")
+  field(DO3, "1")
+  field(LNK4, "$(P):senseFuncRES.PROC PP NMS")
+  field(DO4, "1")
+  field(LNK5, "$(P):senseFuncAllON.PROC PP NMS")
+  field(DO5, "1")
+  field(SELM, "Specified")
+  field(SELL, "$(P):senseFunctionMO.RVAL CP NMS")
+  info(archive, "Monitor, 00:00:01, VAL")
+  field(SDIS, "$(P):Local NPP MS")
+  field(DISS, "INVALID")
+  field(DISV, "1")
+
+}
+
+record (stringout, "$(P):senseFuncAllOFF"){
+  field(DTYP, "stream")
+  field(VAL, "OFF:ALL")
+  field(OUT, "@keithley2400.proto write_stringnospace(:SENSE:FUNC:) $(PORT)")
+  field(FLNK, "$(P):GetsenseFunction")
+  field(SDIS, "$(P):Local NPP MS")
+  field(DISS, "INVALID")
+  field(DISV, "1")
+
+}
+
+
+record (stringout, "$(P):senseFuncVOLT"){
+  field(DTYP, "stream")
+  field(VAL, "VOLT:DC")
+  field(OUT, "@keithley2400.proto write_stringwquotes(:SENSE:FUNC) $(PORT)")
+  field(FLNK, "$(P):GetsenseFunction")
+  field(SDIS, "$(P):Local NPP MS")
+  field(DISS, "INVALID")
+  field(DISV, "1")
+
+}
+
+
+
+record (stringout, "$(P):senseFuncCURR"){
+  field(DTYP, "stream")
+  field(OUT, "@keithley2400.proto write_stringwquotes(:SENSE:FUNC) $(PORT)")
+  field(VAL, "CURR:DC")
+  field(FLNK, "$(P):GetsenseFunction")
+  field(SDIS, "$(P):Local NPP MS")
+  field(DISS, "INVALID")
+  field(DISV, "1")
+
+}
+
+record (stringout, "$(P):senseFuncRES"){
+  field(DTYP, "stream")
+  field(OUT, "@keithley2400.proto write_stringwquotes(:SENSE:FUNC) $(PORT)")
+  field(VAL, "RES")
+  field(FLNK, "$(P):GetsenseFunction")
+  field(SDIS, "$(P):Local NPP MS")
+  field(DISS, "INVALID")
+  field(DISV, "1")
+
+}
+
+record (stringout, "$(P):senseFuncAllON"){
+  field(DTYP, "stream")
+  field(VAL, "ON:ALL")
+  field(OUT, "@keithley2400.proto write_stringnospace(:SENSE:FUNC:) $(PORT)")
+  field(FLNK, "$(P):GetsenseFunction")
+  field(SDIS, "$(P):Local NPP MS")
+  field(DISS, "INVALID")
+  field(DISV, "1")
+
+}
+
+record(stringin, "$(P):GetsenseFunction") {
+  field(DESC, "Get Sense Function")
+  field(DTYP, "stream")
+  field(INP, "@keithley2400.proto read_string(:SENSE:FUNC) $(PORT)")
+  field(PINI, "YES")
+  field(SDIS, "$(P):Local NPP MS")
+  field(DISS, "INVALID")
+  field(DISV, "1")
+  field(SCAN, "2 second")
+}
+
+#####################################################################
+#2 wire and four wire functions resistance
+#####################################################################
+record(bo, "$(P):setrsen") {
+  field(DESC, "enable disable remote sensing")
+  field(DTYP, "stream")
+  field(SCAN, "Passive")
+  field(OUT, "@keithley2400.proto write_int(:SYST:RSEN) $(PORT)")
+  field(ZNAM, "RSENOff")
+  field(ONAM, "RSENOn")
+  field(FLNK, "$(P):getrsen")
+  info(archive, "Monitor, 00:00:01, VAL")
+  info(autosaveFields, "VAL")
+  field(SDIS, "$(P):Local NPP MS")
+  field(DISS, "INVALID")
+  field(DISV, "1")
+
+}
+
+record(bi, "$(P):getrsen") {
+  field(DESC, "status of remote sensing")
+  field(DTYP, "stream")
+  field(INP, "@keithley2400.proto read_int(:SYST:RSEN) $(PORT)")
+  field(ZNAM, "2-wire")
+  field(ONAM, "4-wire")
+  field(PINI, "YES")
+  info(archive, "Monitor, 00:00:01, VAL")
+  field(SDIS, "$(P):Local NPP MS")
+  field(DISS, "INVALID")
+  field(DISV, "1")
+  field(SCAN, "2 second")
+}
+record(ai, "$(P):ActualResistance") {
+  field(DESC, "get actual resistance")
+  field(DTYP, "stream")
+  field(SCAN, "I/O Intr")
+  field(INP, "@keithley2400.proto read_resistance $(PORT)")
+  field(PREC, "6")
+  field(EGU, "Ohms")
+  field(LINR, "NO CONVERSION")
+  info(archive, "Monitor, 00:00:01, VAL")
+  field(SDIS, "$(P):Local NPP MS")
+  field(DISS, "INVALID")
+  field(DISV, "1")
+
+}
+
+#####################################################################
+#Sense Res mode manual or auto
+####################################################################
+record(bo, "$(P):setresmode") {
+  field(DESC, "Resistance Mode Manual or Auto")
+  field(DTYP, "stream")
+  field(SCAN, "Passive")
+  field(OUT, "@keithley2400.proto setresmode() $(PORT)")
+  field(ZNAM, "MAN")
+  field(ONAM, "AUTO")
+  field(FLNK, "$(P):getresmode") 
+  info(archive, "Monitor, 00:00:01, VAL")
+  info(autosaveFields, "VAL")
+  field(SDIS, "$(P):Local NPP MS")
+  field(DISS, "INVALID")
+  field(DISV, "1")
+
+}
+
+
+record(bi, "$(P):getresmode") {
+  field(DESC, "status Resistance Mode")
+  field(DTYP, "stream")
+  field(INP, "@keithley2400.proto readresmode() $(PORT)")
+  field(ZNAM, "MAN")
+  field(ONAM, "AUTO")
+  field(PINI, "YES")
+  info(archive, "Monitor, 00:00:01, VAL")
+  field(SDIS, "$(P):Local NPP MS")
+  field(DISS, "INVALID")
+  field(DISV, "1")
+  field(SCAN, "2 second")
+
+}
+####################################################################
+
+record(bo, "$(P):scanEnBO") {
+  field(DESC, "Measurement scan enable")
+  field(DOL, "$(P):enabledBI NPP MS")
+  field(SCAN, "Passive")
+  field(PINI, "YES")
+  field(OMSL, "closed_loop")
+  field(ZNAM, "Disable")
+  field(ONAM, "Enable")
+  field(IVOA, "Set output to IVOV")
+  field(IVOV, "0")
+  info(archive, "Monitor, 00:00:01, VAL")
+  field(SDIS, "$(P):Local NPP MS")
+  field(DISS, "INVALID")
+  field(DISV, "1")
+
+}
+
+###################################################################
+#When output is disabled set v,i and R to zero  
+###################################################################
+record(calc, "$(P):ActualVCalc") {
+  field(DESC, "display voltage decide onoff")
+  field(INPA, "$(P):ActualVoltage CP NMS")
+  field(INPB, "$(P):enabledBI CP NMS")
+  field(CALC, "B=1?A:0")
+  field(PREC, "6")
+  field(EGU, "Volts")
+  info(archive, "Monitor, 00:00:01, VAL")
+  field(SDIS, "$(P):Local NPP MS")
+  field(DISS, "INVALID")
+  field(DISV, "1")
+
+}
+
+
+record(calc, "$(P):ActualICalc") {
+  field(DESC, "display current decide onoff")
+  field(INPA, "$(P):ActualCurrent CP NMS")
+  field(INPB, "$(P):enabledBI CP NMS")
+  field(CALC, "B=1?A:0")
+  field(PREC, "6")
+  field(EGU, "Amps")
+  info(archive, "Monitor, 00:00:01, VAL")
+  field(SDIS, "$(P):Local NPP MS")
+  field(DISS, "INVALID")
+  field(DISV, "1")
+
+}
+
+record(calc, "$(P):ActualRCalc") {
+  field(DESC, "display resistance decide onoff")
+  field(INPA, "$(P):ActualResistance CP NMS")
+  field(INPB, "$(P):enabledBI CP NMS")
+  field(CALC, "B=1?A:0")
+  field(PREC, "6")
+  field(EGU, "Ohms")
+  info(archive, "Monitor, 00:00:01, VAL")
+  field(SDIS, "$(P):Local NPP MS")
+  field(DISS, "INVALID")
+  field(DISV, "1")
+
+}
+
+############################################################################
+#Measure Basic Current Steps
+############################################################################
+#*RST
+#:SOUR:FUNC VOLT
+#:SOUR:VOLT:MODE FIXED
+#:SOUR:VOLT:RANG 20
+#:SOUR:VOLT:LEV 10
+#:SENS:CURR:PROT 10E-3
+#:SENS:FUNC "CURR"
+#:SENS:CURR:RANG 10E-3
+#:FORM:ELEM CURR
+#:OUTP ON
+#:READ?
+#:OUTP OFF
+
+record(bo, "$(P):MeasISteps") {
+ field(DESC, "Measure Current Steps")
+ field(HIGH, "1")
+ field(FLNK, "$(P):MeasIStepsSeq")
+}
+
+
+record(seq, "$(P):MeasIStepsSeq") {
+  field(DESC, "Measure Current Steps")		#send RST
+  field(LNK1, "$(P):RST PP NMS")
+  field(DO1, "1")
+  field(DLY1, "0")		
+  field(LNK2, "$(P):sourceFunctionMO PP NMS")  #source function V
+  field(DO2, "1")
+  field(DLY2, "0.3")
+  field(LNK3, "$(P):SourceVModeFixed.PROC PP NMS")  #fixed voltage source
+  field(DO3, "1")
+  field(DLY3, "0.3")
+  field(LNK4, "$(P):vRangeMO.PROC PP NMS")   #set range to auto or manual
+  field(DO4, "1")
+  field(DLY4, "0.3")
+  field(LNK5, "$(P):setComplCurrAO.PROC PP NMS")  #set I complience level
+  field(DO5, "1")
+  field(DLY5, "0.3")
+  field(LNK6, "$(P):senseFunctionMO PP NMS")  #set sense function to clear all
+  field(DO6, "1")
+  field(DLY6, "0.3")
+  field(LNK7, "$(P):senseFunctionMO PP NMS")  #set sense fucntion All ON 
+  field(DO7, "5")
+  field(DLY7, "0.3")
+  field(LNK8, "$(P):iRangeMO.PROC PP NMS")  #process range setting man or auto
+  field(DO8, "1")
+  field(DLY8, "0.3")
+  field(LNK9, "$(P):iRangeSP.PROC PP NMS")  #process the irange sp
+  field(DO9, "1")
+  field(DLY9, "0.3")
+  info(archive, "Monitor, 00:00:01, VAL")
+  field(SDIS, "$(P):Local NPP MS")
+  field(DISS, "INVALID")
+  field(DISV, "1")
+
+}
+
+
+
+###########################################################################
+#Measure Basic Voltage Steps
+############################################################################
+#*RST
+#:SOUR:FUNC CURR
+#:SOUR:CURR:MODE FIXED
+#:SENS:FUNC “VOLT”
+#:SOUR:CURR:RANG MIN
+#:SOUR:CURR:LEV 0
+#:SENS:VOLT:PROT 25
+#:SENS:VOLT:RANG 20
+#:FORM:ELEM VOLT
+#:OUTP ON
+#:READ?
+#:OUTP OFF
+record(bo, "$(P):MeasVSteps") {
+ field(DESC, "Measure Voltage Steps")
+ field(HIGH, "1")
+ field(FLNK, "$(P):MeasVStepsSeq")
+}
+
+
+record(seq, "$(P):MeasVStepsSeq") {
+  field(DESC, "Measure Voltage Steps")
+  field(LNK1, "$(P):RST PP NMS")           #send RST
+  field(DO1, "1")
+  field(DLY1, "0")
+  field(LNK2, "$(P):sourceFunctionMO PP NMS")       #set source function to current
+  field(DO2, "0")
+  field(DLY2, "0.3")
+  field(LNK3, "$(P):SourceIModeFixed.PROC PP NMS")  #fixed current source
+  field(DO3, "1")
+  field(DLY3, "0.3")
+  field(LNK4, "$(P):senseFunctionMO PP NMS")        #set sense function to clear all
+  field(DO4, "1")
+  field(DLY4, "0.3")
+  field(LNK5, "$(P):senseFunctionMO PP NMS")        #set sense function ALL ON
+  field(DO5, "5")
+  field(DLY5, "0.3")
+  field(LNK6, "$(P):iRangeMO.PROC PP NMS")          #process range setting man or auto
+  field(DO6, "1")
+  field(DLY6, "0.3")
+  field(LNK7, "$(P):iRangeSP.PROC PP NMS")          #process the irange sp
+  field(DO7, "1")
+  field(DLY7, "0.3")
+  field(LNK8, "$(P):setCurrAO.PROC PP NMS")          #process the current Level
+  field(DO8, "1")
+  field(DLY8, "0.3")
+  field(LNK9, "$(P):setComplVoltAO.PROC PP NMS")          #Process the voltage compliance
+  field(DO9, "1")
+  field(DLY9, "0.3")
+  field(LNKA, "$(P):vRangeMO.PROC PP NMS")          #Process the voltage range manual auto
+  field(DOA, "1")
+  field(DLYA, "0.3")
+  info(archive, "Monitor, 00:00:01, VAL")
+  field(SDIS, "$(P):Local NPP MS")
+  field(DISS, "INVALID")
+  field(DISV, "1")
+  field(FLNK, "$(P):MeasVStepsSeq2")
+}
+
+
+record(seq, "$(P):MeasVStepsSeq2") {
+  field(DESC, "Measure Voltage Steps2")          
+  field(LNK1, "$(P):vRangeSP.PROC PP NMS")       #Process the voltage range SP
+  field(DO1, "1")
+  field(DLY1, "0")
+  info(archive, "Monitor, 00:00:01, VAL")
+  field(SDIS, "$(P):Local NPP MS")
+  field(DISS, "INVALID")
+  field(DISV, "1")
+
+}
+
+
+###########################################################################
+##Resistance Measurement steps 2-wire
+###########################################################################
+#*RST
+#FUNC “RES”
+#RES:MODE AUTO
+#RES:RANG 20E3
+#:FORM:ELEM RES
+#:OUTP ON
+#:READ?
+#:OUTP OFF
+#
+record(bo, "$(P):MeasR2Steps") {
+ field(DESC, "Measure Resistance Steps 2w")
+ field(HIGH, "1")
+ field(FLNK, "$(P):MeasR2StepsSeq")
+}
+
+
+record(seq, "$(P):MeasR2StepsSeq") {
+  field(DESC, "Measure Resitance Steps 2w")
+  field(LNK1, "$(P):RST PP NMS")			#send reset
+  field(DO1, "1")
+  field(DLY1, "0")
+  field(LNK2, "$(P):senseFunctionMO PP NMS")            #sense function all on
+  field(DO2, "5")
+  field(DLY2, "0.3")
+  field(LNK3, "$(P):setresmode PP NMS")                 #set res mode to auto not related to range
+  field(DO3, "1")
+  field(DLY3, "0.3")
+  field(LNK4, "$(P):RRangeSP.PROC PP NMS")              #proc range sp
+  field(DO4, "1")
+  field(DLY4, "0.3")
+  field(LNK5, "$(P):rRangeMO.PROC PP NMS")		#process the range auto or manual 
+  field(DO5, "1")
+  field(DLY5, "0.3")
+  field(LNK6, "$(P):setrsen PP NMS")			#set resistance to 2-wire
+  field(DO6, "0")
+  field(DLY6, "0.3")
+  info(archive, "Monitor, 00:00:01, VAL")
+  field(SDIS, "$(P):Local NPP MS")
+  field(DISS, "INVALID")
+  field(DISV, "1")
+
+}
+
+
+##########################################################################
+#Resistance Measurement steps 4-wire
+##########################################################################
+#*RST
+#FUNC “RES”
+#RES:MODE AUTO
+#RES:RANG 20E3
+#:SYST:RSEN ON    4-wire
+#:FORM:ELEM RES
+#:OUTP ON
+#:READ?
+#:OUTP OFF
+
+record(bo, "$(P):MeasR4Steps") {
+ field(DESC, "Measure Resistance Steps 4w")
+ field(HIGH, "1")
+ field(FLNK, "$(P):MeasR4StepsSeq")
+}
+
+
+record(seq, "$(P):MeasR4StepsSeq") {
+  field(DESC, "Measure Resitance Steps 4w")
+  field(LNK1, "$(P):RST PP NMS")			#send reset
+  field(DO1, "1")
+  field(DLY1, "0")
+  field(LNK2, "$(P):senseFunctionMO PP NMS")            #sense function all on
+  field(DO2, "5")
+  field(DLY2, "0.3")
+  field(LNK3, "$(P):setresmode PP NMS")                 #set res mode to auto not related to range
+  field(DO3, "1")
+  field(DLY3, "0.3")
+  field(LNK4, "$(P):RRangeSP.PROC PP NMS")              #proc range sp
+  field(DO4, "1")
+  field(DLY4, "0.3")
+  field(LNK5, "$(P):rRangeMO.PROC PP NMS")              #process the range auto or manual 
+  field(DO5, "1")
+  field(DLY5, "0.3")
+  field(LNK6, "$(P):setrsen PP NMS")                    #set resistance to 4-wire
+  field(DO6, "1")
+  field(DLY6, "0.3")
+  info(archive, "Monitor, 00:00:01, VAL")
+  field(SDIS, "$(P):Local NPP MS")
+  field(DISS, "INVALID")
+  field(DISV, "1")
+
+}
+
+
+##############################################
+#ALARMS
+##############################################
+record(calc, "$(P):ALARMS"){
+  field(DESC, "Global Alarm")
+  field(INPA, "$(P):voltComplBI CP NMS")
+  field(INPB, "$(P):currComplBI CP NMS")
+  field(CALC, "A|B")
+  info(archive, "Monitor, 00:00:01, VAL")
+}
+
+##############################################
+#RANGES SETTING for Resistance
+##############################################
+
+record(mbbo, "$(P):RRangeSP") {
+  field(DESC, "Set Resistance range")
+  field(DTYP, "stream")
+  field(SCAN, "Passive")
+  field(ZRST, "21 Ohms")
+  field(ZRVL, "21")
+  field(ONST, "210 Ohms")
+  field(ONVL, "210")
+  field(TWST, "2100 Ohms")
+  field(TWVL, "2100")
+  field(THST, "21000 Ohms")
+  field(THVL, "21000")
+  field(OUT, "@keithley2400.proto writeresrange() $(PORT)")
+  field(FLNK, "$(P):RangeRead")
+  info(archive, "Monitor, 00:00:01, VAL")
+  info(autosaveFields, "VAL")
+  field(SDIS, "$(P):Local NPP MS")
+  field(DISS, "INVALID")
+  field(DISV, "1")
+}
+
+
+
+record(ai, "$(P):RRangeRead") {
+  field(DESC, "Read Range")
+  field(DTYP, "stream")
+  field(PINI, "YES")
+  field(INP, "@keithley2400.proto readresrange() $(PORT)")
+  field(PREC, "6")
+  field(EGU, "Ohms")
+  field(LINR, "NO CONVERSION")
+  info(archive, "Monitor, 00:00:01, VAL")
+  field(SDIS, "$(P):Local NPP MS")
+  field(DISS, "INVALID")
+  field(DISV, "1")
+  field(SCAN, "2 second")
+}
+
+record(mbbo, "$(P):rRangeMO") {
+  field(DESC, "Resistance range Mode")
+  field(DTYP, "stream")
+  field(SCAN, "Passive")
+  field(ZRST, "MANUAL")
+  field(ZRVL, "0")
+  field(ONST, "AUTO")
+  field(ONVL, "1")
+  field(OUT, "@keithley2400.proto write_int(:RES:RANG:AUTO) $(PORT)")
+  field(FLNK, "$(P):rRangeMI")
+  info(archive, "Monitor, 00:00:01, VAL")
+  info(autosaveFields, "VAL")
+  field(SDIS, "$(P):Local NPP MS")
+  field(DISS, "INVALID")
+  field(DISV, "1")
+
+}
+
+record(bi, "$(P):rRangeMI") {
+  field(DESC, "Resistance Range status")
+  field(DTYP, "stream")
+  field(INP, "@keithley2400.proto read_int(:RES:RANG:AUTO) $(PORT)")
+  field(ZNAM, "MANUAL")
+  field(ONAM, "AUTO")
+  field(PINI, "YES")
+  info(archive, "Monitor, 00:00:01, VAL")
+  field(SDIS, "$(P):Local NPP MS")
+  field(DISS, "INVALID")
+  field(DISV, "1")
+  field(SCAN, "2 second")
+}
+
+###############################################
+#Source fixed
+###############################################
+
+record (stringout, "$(P):SourceIModeFixed"){
+  field(DESC, "Source Current Mode Fixed")
+  field(DTYP, "stream")
+  field(VAL, "FIXED")
+  field(OUT, "@keithley2400.proto write_string(:SOUR:CURR:MODE) $(PORT)")
+  field(SDIS, "$(P):Local NPP MS")
+  field(DISS, "INVALID")
+  field(DISV, "1")
+
+}
+
+
+record (stringout, "$(P):SourceVModeFixed"){
+  field(DESC, "Source Voltage Mode Fixed")
+  field(DTYP, "stream")
+  field(VAL, "FIXED")
+  field(OUT, "@keithley2400.proto write_string(:SOUR:VOLT:MODE) $(PORT)")
+  field(SDIS, "$(P):Local NPP MS")
+  field(DISS, "INVALID")
+  field(DISV, "1")
+
+}
+
+
+
+

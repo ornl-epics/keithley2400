@@ -1,0 +1,16 @@
+# Macros:
+#  P         Device prefix
+#  Q         Device suffix
+#  PORT      Asyn port name
+#  name      Name to export to gda as
+#  gda_desc  Description for gda
+
+
+file keithley2400.template
+{
+pattern { P, Q, PORT }
+    { "BL4A:SM1", "", "SOURC1" }
+    { "BL4A:SM2", "", "SOURC2" }
+
+}
+
